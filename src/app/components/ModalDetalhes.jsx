@@ -1,0 +1,267 @@
+'use client'
+
+import { useState } from 'react'
+
+export default function ModalDetalhes({ card, onFechar, onAtualizar, darkMode }) {
+  const [observacoes, setObservacoes] = useState(card.observacoes || '')
+  const [salvandoObs, setSalvandoObs] = useState(false)
+  const [novoServico, setNovoServico] = useState('')
+  const [novaTarefa, setNovaTarefa] = useState('')
+  const [servicos, setServicos] = useState(card.servicos || [])
+  const [tarefas, setTarefas] = useState(card.tarefas || [])
+
+  const bg = darkMode ? '#1e293b' : 'white'
+  const bgSec = darkMode ? '#0f172a' : '#f8fafc'
+  const borda = darkMode ? '#334155' : '#e2e8f0'
+  const tp = darkMode ? '#f1f5f9' : '#0f172a'
+  const ts = darkMode ? '#94a3b8' : '#64748b'
+
+  const salvarObservacoes = async () => {
+    setSalvandoObs(true)
+    await fetch(`/api/cards/${card.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ observacoes }),
+    })
+    setSalvandoObs(false)
+    onAtualizar()
+  }
+
+  const adicionarServico = async () => {
+    if (!novoServico.trim()) return
+    const res = await fetch(`/api/cards/${card.id}/servicos`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ descricao: novoServico }),
+    })
+    const data = await res.json()
+    setServicos(s => [...s, data])
+    setNovoServico('')
+  }
+
+  const deletarServico = async (servicoId) => {
+    await fetch(`/api/cards/${card.id}/servicos`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ servicoId }),
+    })
+    setServicos(s => s.filter(x => x.id !== servicoId))
+  }
+
+  const adicionarTarefa = async () => {
+    if (!novaTarefa.trim()) return
+    const res = await fetch(`/api/cards/${card.id}/tarefas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ descricao: novaTarefa }),
+    })
+    const data = await res.json()
+    setTarefas(t => [...t, data])
+    setNovaTarefa('')
+  }
+
+  const toggleTarefa = async (tarefaId, feita) => {
+    await fetch(`/api/cards/${card.id}/tarefas`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tarefaId, feita: !feita }),
+    })
+    setTarefas(t => t.map(x => x.id === tarefaId ? { ...x, feita: !feita } : x))
+  }
+
+  const deletarTarefa = async (tarefaId) => {
+    await fetch(`/api/cards/${card.id}/tarefas`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tarefaId }),
+    })
+    setTarefas(t => t.filter(x => x.id !== tarefaId))
+  }
+
+  const tarefasFeitas = tarefas.filter(t => t.feita).length
+  const progresso = tarefas.length > 0 ? (tarefasFeitas / tarefas.length) * 100 : 0
+
+  const labelStyle = {
+    fontSize: '11px', fontWeight: '700', color: ts,
+    textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px',
+  }
+
+  const inputStyle = {
+    flex: 1, padding: '10px 14px', borderRadius: '8px',
+    border: `1px solid ${borda}`, fontSize: '14px', outline: 'none',
+    background: bgSec, color: tp,
+  }
+
+  const btnAdicionar = {
+    background: '#0f172a', color: 'white', border: 'none',
+    borderRadius: '8px', padding: '10px 16px', cursor: 'pointer',
+    fontWeight: '700', fontSize: '16px',
+  }
+
+  const itemStyle = {
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    background: bgSec, borderRadius: '8px', padding: '10px 14px',
+    border: `1px solid ${borda}`, marginBottom: '6px',
+  }
+
+  const btnDeletar = {
+    background: '#fee2e2', border: 'none', borderRadius: '5px',
+    padding: '3px 8px', cursor: 'pointer', color: '#ef4444', fontSize: '11px', flexShrink: 0,
+  }
+
+  return (
+    <div
+      onClick={e => e.target === e.currentTarget && onFechar()}
+      style={{
+        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        zIndex: 1000, padding: '24px',
+      }}
+    >
+      <div style={{
+        background: bg, borderRadius: '16px', width: '100%', maxWidth: '600px',
+        maxHeight: '90vh', overflowY: 'auto',
+        boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
+      }}>
+
+        {/* Header */}
+        <div style={{
+          padding: '24px', borderBottom: `1px solid ${borda}`,
+          position: 'sticky', top: 0, background: bg, zIndex: 10,
+          borderRadius: '16px 16px 0 0',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <div style={{ fontSize: '12px', color: ts, marginBottom: '4px' }}>
+                {card.mecanico?.nome} · {card.placa}
+              </div>
+              <h2 style={{ margin: '0 0 4px', fontSize: '22px', fontWeight: '800', color: tp, letterSpacing: '-0.5px' }}>
+                {card.carro}
+              </h2>
+              <div style={{ fontSize: '14px', color: ts }}>{card.cliente}</div>
+            </div>
+            <button onClick={onFechar} style={{
+              background: bgSec, border: 'none', borderRadius: '8px',
+              padding: '8px 12px', cursor: 'pointer', fontSize: '16px', color: ts,
+            }}>✕</button>
+          </div>
+        </div>
+
+        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
+          {/* Descrição do cliente */}
+          {card.descricaoCliente && (
+            <div>
+              <div style={labelStyle}>Descrição do Cliente</div>
+              <div style={{
+                background: bgSec, borderRadius: '10px', padding: '14px',
+                fontSize: '14px', color: tp, lineHeight: '1.6', border: `1px solid ${borda}`,
+              }}>
+                {card.descricaoCliente}
+              </div>
+            </div>
+          )}
+
+          {/* Serviços / Peças */}
+          <div>
+            <div style={labelStyle}>Serviços / Peças</div>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+              <input
+                value={novoServico}
+                onChange={e => setNovoServico(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && adicionarServico()}
+                placeholder="Ex: Troca de óleo, Pastilha de freio..."
+                style={inputStyle}
+              />
+              <button onClick={adicionarServico} style={btnAdicionar}>+</button>
+            </div>
+            {servicos.length === 0
+              ? <div style={{ fontSize: '13px', color: ts, textAlign: 'center', padding: '12px' }}>Nenhum serviço adicionado</div>
+              : servicos.map(s => (
+                <div key={s.id} style={itemStyle}>
+                  <span style={{ fontSize: '14px', color: tp }}>🔩 {s.descricao}</span>
+                  <button onClick={() => deletarServico(s.id)} style={btnDeletar}>✕</button>
+                </div>
+              ))
+            }
+          </div>
+
+          {/* Checklist */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <div style={labelStyle}>Checklist</div>
+              {tarefas.length > 0 && (
+                <div style={{ fontSize: '12px', color: ts }}>{tarefasFeitas}/{tarefas.length} concluídas</div>
+              )}
+            </div>
+            {tarefas.length > 0 && (
+              <div style={{ height: '4px', background: borda, borderRadius: '2px', marginBottom: '12px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', borderRadius: '2px', background: '#10b981', width: `${progresso}%`, transition: 'width 0.3s' }} />
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+              <input
+                value={novaTarefa}
+                onChange={e => setNovaTarefa(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && adicionarTarefa()}
+                placeholder="Ex: Verificar correia dentada..."
+                style={inputStyle}
+              />
+              <button onClick={adicionarTarefa} style={btnAdicionar}>+</button>
+            </div>
+            {tarefas.length === 0
+              ? <div style={{ fontSize: '13px', color: ts, textAlign: 'center', padding: '12px' }}>Nenhuma tarefa adicionada</div>
+              : tarefas.map(t => (
+                <div key={t.id} style={{ ...itemStyle, gap: '10px', justifyContent: 'flex-start' }}>
+                  <input
+                    type="checkbox"
+                    checked={t.feita}
+                    onChange={() => toggleTarefa(t.id, t.feita)}
+                    style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#10b981', flexShrink: 0 }}
+                  />
+                  <span style={{
+                    flex: 1, fontSize: '14px', color: tp,
+                    textDecoration: t.feita ? 'line-through' : 'none',
+                    opacity: t.feita ? 0.5 : 1,
+                  }}>
+                    {t.descricao}
+                  </span>
+                  <button onClick={() => deletarTarefa(t.id)} style={btnDeletar}>✕</button>
+                </div>
+              ))
+            }
+          </div>
+
+          {/* Observações */}
+          <div>
+            <div style={labelStyle}>Observações do Mecânico</div>
+            <textarea
+              value={observacoes}
+              onChange={e => setObservacoes(e.target.value)}
+              placeholder="Anotações, diagnósticos, observações..."
+              rows={4}
+              style={{
+                width: '100%', padding: '12px 14px', borderRadius: '8px',
+                border: `1px solid ${borda}`, fontSize: '14px', outline: 'none',
+                background: bgSec, color: tp, resize: 'vertical',
+                fontFamily: 'inherit', lineHeight: '1.6', boxSizing: 'border-box',
+              }}
+            />
+            <button
+              onClick={salvarObservacoes}
+              disabled={salvandoObs}
+              style={{
+                marginTop: '8px', background: '#0f172a', color: 'white', border: 'none',
+                borderRadius: '8px', padding: '10px 20px', fontSize: '14px',
+                fontWeight: '600', cursor: 'pointer', opacity: salvandoObs ? 0.7 : 1,
+              }}
+            >
+              {salvandoObs ? 'Salvando...' : 'Salvar Observações'}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  )
+}
