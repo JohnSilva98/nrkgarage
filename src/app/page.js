@@ -18,7 +18,7 @@ export default function LoginPage() {
 
   // Se já está logado, redirecionar
   if (session) {
-    router.push('/');
+    router.push('/home');
     return null;
   }
 
@@ -34,7 +34,7 @@ export default function LoginPage() {
       });
 
       if (result.ok) {
-        router.push('/');
+        router.push('/home');
       } else {
         setError('Email ou senha incorretos');
       }
@@ -130,23 +130,10 @@ export default function LoginPage() {
               </button>
             </div>
 
-            {/* Link Esqueci Senha */}
-            <div className="text-center">
-              <a href="#" className="text-sm text-blue-600 hover:text-blue-500">
-                Esqueceu sua senha?
-              </a>
-            </div>
+         
           </form>
 
-          {/* Link para Cadastro */}
-          <div className="text-center pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-600">
-              Ainda não tem uma conta?{' '}
-              <a href="/api/register" className="font-medium text-blue-600 hover:text-blue-500">
-                Cadastre-se
-              </a>
-            </p>
-          </div>
+       
         </div>
       </div>
     </div>

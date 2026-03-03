@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
-import { NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export function middleware(request) {
-  const token = request.cookies.get("token")?.value;
+export async function middleware(request) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
   const { pathname } = request.nextUrl;
 
-  // 🔓 Rotas públicas
-  const publicRoutes = ["/"];
-
-  // Se for rota pública, deixa passar
-  if (publicRoutes.includes(pathname)) {
+  // rota pública
+  if (pathname === "/") {
     return NextResponse.next();
   }
 
