@@ -1,23 +1,26 @@
-import { NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
+import { NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get("token")?.value;
+  const { pathname } = request.nextUrl;
 
-export async function middleware(request) {
-  const token = request.cookies.get('token')?.value;
+  // 🔓 Rotas públicas
+  const publicRoutes = ["/"];
 
-  if (!token) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-
-  try {
-    await jwtVerify(token, secret);
+  // Se for rota pública, deixa passar
+  if (publicRoutes.includes(pathname)) {
     return NextResponse.next();
-  } catch {
-    return NextResponse.redirect(new URL('/', request.url));
   }
+
+  // Se não estiver autenticado, redireciona
+  if (!token) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/((?!login|api|_next|favicon.ico).*)'],
+  matcher: ["/((?!api|_next|favicon.ico).*)"],
 };
