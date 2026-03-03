@@ -9,6 +9,7 @@ export default function ModalDetalhes({ card, onFechar, onAtualizar, darkMode })
   const [novaTarefa, setNovaTarefa] = useState('')
   const [servicos, setServicos] = useState(card.servicos || [])
   const [tarefas, setTarefas] = useState(card.tarefas || [])
+  const [orcamento, setOrcamento] = useState(card.orcamento || '')
 
   const bg = darkMode ? '#1e293b' : 'white'
   const bgSec = darkMode ? '#0f172a' : '#f8fafc'
@@ -25,6 +26,7 @@ export default function ModalDetalhes({ card, onFechar, onAtualizar, darkMode })
     })
     setSalvandoObs(false)
     onAtualizar()
+    onFechar()
   }
 
   const adicionarServico = async () => {
@@ -77,6 +79,24 @@ export default function ModalDetalhes({ card, onFechar, onAtualizar, darkMode })
     })
     setTarefas(t => t.filter(x => x.id !== tarefaId))
   }
+
+const handleOrcamentoChange = (e) => {
+  const value = e.target.value.replace(/\D/g, '');
+
+  if (!value) {
+    setOrcamento('');
+    return;
+  }
+
+  const numberValue = Number(value) / 100;
+
+  const formatted = new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(numberValue);
+
+  setOrcamento(formatted);
+};
 
   const tarefasFeitas = tarefas.filter(t => t.feita).length
   const progresso = tarefas.length > 0 ? (tarefasFeitas / tarefas.length) * 100 : 0
@@ -186,51 +206,7 @@ export default function ModalDetalhes({ card, onFechar, onAtualizar, darkMode })
             }
           </div>
 
-          {/* Checklist */}
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <div style={labelStyle}>Checklist</div>
-              {tarefas.length > 0 && (
-                <div style={{ fontSize: '12px', color: ts }}>{tarefasFeitas}/{tarefas.length} concluídas</div>
-              )}
-            </div>
-            {tarefas.length > 0 && (
-              <div style={{ height: '4px', background: borda, borderRadius: '2px', marginBottom: '12px', overflow: 'hidden' }}>
-                <div style={{ height: '100%', borderRadius: '2px', background: '#10b981', width: `${progresso}%`, transition: 'width 0.3s' }} />
-              </div>
-            )}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-              <input
-                value={novaTarefa}
-                onChange={e => setNovaTarefa(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && adicionarTarefa()}
-                placeholder="Ex: Verificar correia dentada..."
-                style={inputStyle}
-              />
-              <button onClick={adicionarTarefa} style={btnAdicionar}>+</button>
-            </div>
-            {tarefas.length === 0
-              ? <div style={{ fontSize: '13px', color: ts, textAlign: 'center', padding: '12px' }}>Nenhuma tarefa adicionada</div>
-              : tarefas.map(t => (
-                <div key={t.id} style={{ ...itemStyle, gap: '10px', justifyContent: 'flex-start' }}>
-                  <input
-                    type="checkbox"
-                    checked={t.feita}
-                    onChange={() => toggleTarefa(t.id, t.feita)}
-                    style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#10b981', flexShrink: 0 }}
-                  />
-                  <span style={{
-                    flex: 1, fontSize: '14px', color: tp,
-                    textDecoration: t.feita ? 'line-through' : 'none',
-                    opacity: t.feita ? 0.5 : 1,
-                  }}>
-                    {t.descricao}
-                  </span>
-                  <button onClick={() => deletarTarefa(t.id)} style={btnDeletar}>✕</button>
-                </div>
-              ))
-            }
-          </div>
+         
 
           {/* Observações */}
           <div>
@@ -247,6 +223,18 @@ export default function ModalDetalhes({ card, onFechar, onAtualizar, darkMode })
                 fontFamily: 'inherit', lineHeight: '1.6', boxSizing: 'border-box',
               }}
             />
+            {/* campo do valor de orçamento */}
+            <div>
+              <div style={labelStyle}>Valor de Orçamento</div>
+              <input
+                type="text"
+                value={orcamento}
+                onChange={handleOrcamentoChange}
+                placeholder="0.00"
+                style={inputStyle}
+              />
+            </div>
+
             <button
               onClick={salvarObservacoes}
               disabled={salvandoObs}
