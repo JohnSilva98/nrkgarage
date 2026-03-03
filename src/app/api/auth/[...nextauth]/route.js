@@ -16,7 +16,7 @@ const handler = NextAuth({
       async authorize(credentials) {
         // 🔥 Aqui você valida no banco
         if (
-          credentials.email === "admin@email.com" &&
+          credentials.email === "admin@nrkgarage.com" &&
           credentials.password === "123456"
         ) {
           return {
