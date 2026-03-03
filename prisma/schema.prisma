@@ -1,0 +1,46 @@
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  
+}
+
+model Mecanico {
+  id        String   @id @default(cuid())
+  nome      String
+  ativo     Boolean  @default(true)
+  cards     Card[]
+  createdAt DateTime @default(now())
+}
+
+model Card {
+  id         String   @id @default(cuid())
+  carro      String
+  placa      String
+  cliente    String
+  status     Status   @default(CRIADO)
+  mecanicoId String
+  mecanico   Mecanico @relation(fields: [mecanicoId], references: [id])
+  servicos   Servico[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Servico {
+  id        String   @id @default(cuid())
+  descricao String
+  cardId    String
+  card      Card     @relation(fields: [cardId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+enum Status {
+  CRIADO
+  AGUARDANDO_INICIO
+  TRABALHANDO
+  AGUARDANDO_ENTREGA
+}
