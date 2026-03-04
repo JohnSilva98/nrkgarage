@@ -25,6 +25,7 @@ function formatarTempo(dataISO) {
 
 function CardKanban ({ card, onMover, onDeletar, colunas, onAbrirDetalhes })  {
   const colAtual = colunas.findIndex(c => c.key === card.status)
+  const isUltimaColuna = colAtual === colunas.length - 1
 
   return (
     <div onClick={() => onAbrirDetalhes(card)}  className="bg-white dark:bg-gray-800 rounded-xl p-3.5 mb-2.5 shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-200 hover:shadow-md hover:-translate-y-px cursor-pointer" 
@@ -72,10 +73,23 @@ function CardKanban ({ card, onMover, onDeletar, colunas, onAbrirDetalhes })  {
               →
             </button>
           )}
-          <button onClick={(e) => {e.stopPropagation(); onDeletar(card.id);}}
-            style={{ background: '#fee2e2', border: 'none', borderRadius: '5px', padding: '4px 8px', fontSize: '11px', cursor: 'pointer', color: '#ef4444' }}>
-            ✕
-          </button>
+       <button
+  onClick={(e) => {
+    e.stopPropagation();
+    onDeletar(card.id);
+  }}
+  style={{
+    background: isUltimaColuna ? '#dcfce7' : '#fee2e2',
+    border: 'none',
+    borderRadius: '5px',
+    padding: '4px 8px',
+    fontSize: '11px',
+    cursor: 'pointer',
+    color: isUltimaColuna ? '#16a34a' : '#ef4444'
+  }}
+>
+  {isUltimaColuna ? "✓" : "✕"}
+</button>
         </div>
       </div>
     </div>
@@ -274,7 +288,7 @@ export default function Home() {
   }
 
   const deletarCard = async (id) => {
-    if (!confirm('Remover este trabalho?')) return
+    if (!confirm('Finalizar este trabalho?')) return
     await fetch(`/api/cards/${id}`, { method: 'DELETE' })
     await buscarDados()
   }
@@ -431,7 +445,7 @@ export default function Home() {
     card={cardSelecionado}
     onFechar={() => setCardSelecionado(null)}
     onAtualizar={buscarDados}
-    
+
     darkMode={darkMode}
   />
 )}
