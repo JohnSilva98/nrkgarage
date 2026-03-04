@@ -100,23 +100,43 @@ function ModalNovoCard({ mecanicos, onSalvar, onFechar }) {
   const [form, setForm] = useState({ carro: '', placa: '', cliente: '', mecanicoId: '', description: '' })
   const [salvando, setSalvando] = useState(false)
 
+  const formatarPlaca = (valor) => {
+  valor = valor.toUpperCase()
+  valor = valor.replace(/[^A-Z0-9]/g, '') // remove tudo inválido
+  valor = valor.slice(0, 7) // máximo 7 caracteres sem hífen
+
+  if (valor.length > 3) {
+    valor = valor.slice(0, 3) + '-' + valor.slice(3)
+  }
+
+  return valor
+}
+
+const placaValida = regexPlaca.test(form.placa)
+
   const handleSalvar = async () => {
     if (!form.carro || !form.placa || !form.mecanicoId) return
     setSalvando(true)
+   const regexPlaca = /^[A-Z]{3}-[0-9][A-Z0-9][0-9]{2}$/
+
+if (!regexPlaca.test(form.placa)) {
+  Toastify({
+    text: "Placa inválida! Use ABC-1234 ou ABC-1D23",
+    duration: 3000,
+    gravity: "top",
+    position: "right",
+    style: {
+      background: "linear-gradient(to right, #ef4444, #dc2626)",
+      width: "300px",
+    },
+  }).showToast()
+
+  setSalvando(false)
+  return
+}
     await onSalvar(form)
     setSalvando(false)
-    Toastify({
-      text: "Trabalho criado com sucesso!",
-      duration: 3000,
-      close: true,
-      gravity: "top", // `top` or `bottom`
-      position: "right", // `left`, `center` or `right`
-      style: {
-        background: "linear-gradient(to right, #00b09b, #96c93d)",
-        width: "300px",
-      },
-      
-    }).showToast();
+    
   }
 
 
@@ -141,7 +161,14 @@ function ModalNovoCard({ mecanicos, onSalvar, onFechar }) {
             </label>
             <input
               value={form[key]}
-              onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+              onChange={e =>
+  setForm(f => ({
+    ...f,
+    [key]: key === 'placa'
+      ? e.target.value.toUpperCase()
+      : e.target.value
+  }))
+}
               placeholder={placeholder}
               className="w-full px-3.5 py-2.5 rounded-lg border border-gray-600 text-sm outline-none box-border text-white bg-gray-700"
             />
@@ -434,6 +461,7 @@ export default function Home() {
 
       {modalAberto && (
         <ModalNovoCard
+        
           mecanicos={mecanicos}
           onSalvar={criarCard}
           onFechar={() => setModalAberto(false)}
