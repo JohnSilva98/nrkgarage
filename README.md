@@ -160,7 +160,7 @@ Para suporte, envie um e-mail para [seu-email@exemplo.com] ou abra uma issue no 
 
 ## 🔄 Roadmap
 
-- [ ] Sistema de notificações
+- [X] Sistema de notificações
 - [ ] Relatórios e analytics
 - [ ] Integração com sistemas de pagamento
 - [ ] Aplicativo mobile
