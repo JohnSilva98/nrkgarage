@@ -156,7 +156,7 @@ Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICEN
 
 ## 🆘 Suporte
 
-Para suporte, envie um e-mail para [seu-email@exemplo.com] ou abra uma issue no GitHub.
+Para suporte, envie um e-mail para [bsilva.jonathan@outlook.com] ou abra uma issue no GitHub.
 
 ## 🔄 Roadmap
 
