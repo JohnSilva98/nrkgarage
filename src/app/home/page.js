@@ -1,7 +1,7 @@
 'use client'
 import Header from '../components/header'
 import ModalDetalhes from '../components/ModalDetalhes'
-
+import Toastify from 'toastify-js'
 import { useState, useEffect, useCallback } from 'react'
 
 const COLUNAS = [
@@ -91,6 +91,18 @@ function ModalNovoCard({ mecanicos, onSalvar, onFechar }) {
     setSalvando(true)
     await onSalvar(form)
     setSalvando(false)
+    Toastify({
+      text: "Trabalho criado com sucesso!",
+      duration: 3000,
+      close: true,
+      gravity: "top", // `top` or `bottom`
+      position: "right", // `left`, `center` or `right`
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)",
+        width: "300px",
+      },
+      
+    }).showToast();
   }
 
 
@@ -246,6 +258,19 @@ export default function Home() {
       body: JSON.stringify({ status: novoStatus }),
     })
     await buscarDados()
+    Toastify({
+      text: "Status do trabalho atualizado com sucesso!",
+      duration: 3000,
+      transition: 'bounce',
+      gravity: 'top',
+      position: 'right',
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)",
+        width: "300px",
+        borderRadius: "8px",
+      },
+      
+    }).showToast();
   }
 
   const deletarCard = async (id) => {
@@ -406,6 +431,7 @@ export default function Home() {
     card={cardSelecionado}
     onFechar={() => setCardSelecionado(null)}
     onAtualizar={buscarDados}
+    
     darkMode={darkMode}
   />
 )}

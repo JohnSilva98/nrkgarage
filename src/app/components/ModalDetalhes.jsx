@@ -1,5 +1,5 @@
 'use client'
-
+import Toastify from 'toastify-js'
 import { useState } from 'react'
 
 export default function ModalDetalhes({ card, onFechar, onAtualizar, darkMode }) {
@@ -26,6 +26,19 @@ export default function ModalDetalhes({ card, onFechar, onAtualizar, darkMode })
     })
     setSalvandoObs(false)
     onAtualizar()
+    Toastify({
+      text: "Observações salvas com sucesso!",
+      duration: 3000,
+      close: true,
+      transition: 'bounce',
+      gravity: 'top',
+      position: 'right',
+      style: {
+        background: "linear-gradient(to right, #00b09b, #96c93d)",
+        width: "300px",
+        borderRadius: "8px",
+      },
+    }).showToast();
     onFechar()
   }
 
