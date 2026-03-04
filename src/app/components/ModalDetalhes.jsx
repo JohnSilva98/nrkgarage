@@ -166,12 +166,15 @@ const handleOrcamentoChange = (e) => {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <div style={{ fontSize: '12px', color: ts, marginBottom: '4px' }}>
-                {card.mecanico?.nome} · {card.placa}
+                <strong className='text-lg text-white'>Mecânico:</strong> {card.mecanico?.nome}
               </div>
               <h2 style={{ margin: '0 0 4px', fontSize: '22px', fontWeight: '800', color: tp, letterSpacing: '-0.5px' }}>
-                {card.carro}
+                <p className='text-lg'><strong>Carro:</strong> {card.carro}</p>
+                <p className='text-lg'><strong>Placa:</strong> {card.placa}</p>
               </h2>
-              <div style={{ fontSize: '14px', color: ts }}>{card.cliente}</div>
+              <div style={{ fontSize: '14px', color: ts }}>
+                <p><strong className='text-white'>Cliente:</strong> {card.cliente}</p>
+              </div>
             </div>
             <button onClick={onFechar} style={{
               background: bgSec, border: 'none', borderRadius: '8px',
