@@ -112,12 +112,12 @@ function ModalNovoCard({ mecanicos, onSalvar, onFechar }) {
   return valor
 }
 
+const regexPlaca = /^[A-Z]{3}-[0-9][A-Z0-9][0-9]{2}$/
 const placaValida = regexPlaca.test(form.placa)
 
   const handleSalvar = async () => {
     if (!form.carro || !form.placa || !form.mecanicoId) return
     setSalvando(true)
-   const regexPlaca = /^[A-Z]{3}-[0-9][A-Z0-9][0-9]{2}$/
 
 if (!regexPlaca.test(form.placa)) {
   Toastify({
@@ -236,7 +236,18 @@ export default function Home() {
   const [cardSelecionado, setCardSelecionado] = useState(null)
 
   useEffect(() => {
+    // Carregar tema do localStorage
+    const savedTheme = localStorage.getItem('darkMode')
+    if (savedTheme !== null) {
+      setDarkMode(savedTheme === 'true')
+    }
+  }, [])
+
+  useEffect(() => {
     const root = document.documentElement
+    // Salvar tema no localStorage
+    localStorage.setItem('darkMode', darkMode)
+    
     if (darkMode) {
       root.style.setProperty('--bg', '#0f172a')
       root.style.setProperty('--card-bg', '#1e293b')
@@ -375,6 +386,20 @@ export default function Home() {
             title="Alternar tema"
           >
             {darkMode ? '☀️' : '🌙'}
+          </button>
+
+          <button
+            onClick={() => {
+              window.location.href = '/api/auth/signout'
+            }}
+            style={{
+              background: '#ef4444', color: 'white', border: 'none',
+              borderRadius: '8px', padding: '8px 16px', fontSize: '14px',
+              fontWeight: '600', cursor: 'pointer', transition: 'background 0.3s',
+            }}
+            title="Sair"
+          >
+            Sair
           </button>
 
           <button
