@@ -324,7 +324,7 @@ export default function Home() {
       
     }).showToast();
   }
-
+// função que deleta o card usando id como parametro
   const deletarCard = async (id) => {
     if (!confirm('Finalizar este trabalho?')) return
     await fetch(`/api/cards/${id}`, { method: 'DELETE' })
